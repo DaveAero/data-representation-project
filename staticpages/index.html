@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bookstore API Interaction</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <h1>Bookstore API Interaction</h1>
+
+    <!-- Get all books -->
+    <button id="getAllBooks">Get All Books</button>
+    <div id="allBooks"></div>
+
+    <!-- Get book by ID -->
+    <h3>Get Book by ID</h3>
+    <input type="number" id="getBookId" placeholder="Enter book ID">
+    <button id="getBookById">Get Book</button>
+    <div id="bookById"></div>
+
+    <!-- Add a new book -->
+    <h3>Add a New Book</h3>
+    <input type="text" id="newBookTitle" placeholder="Title">
+    <input type="text" id="newBookAuthor" placeholder="Author">
+    <input type="number" id="newBookPrice" placeholder="Price">
+    <button id="addBook">Add Book</button>
+    <div id="addBookResponse"></div>
+
+    <!-- Update a book -->
+    <h3>Update Book by ID</h3>
+    <input type="number" id="updateBookId" placeholder="Enter book ID">
+    <input type="text" id="updateBookTitle" placeholder="New Title">
+    <input type="text" id="updateBookAuthor" placeholder="New Author">
+    <input type="number" id="updateBookPrice" placeholder="New Price">
+    <button id="updateBook">Update Book</button>
+    <div id="updateBookResponse"></div>
+
+    <!-- Delete a book -->
+    <h3>Delete Book by ID</h3>
+    <input type="number" id="deleteBookId" placeholder="Enter book ID">
+    <button id="deleteBook">Delete Book</button>
+    <div id="deleteBookResponse"></div>
+
+    <script>
+        // Get all books and display them in a table
+        $('#getAllBooks').click(function() {
+            $.ajax({
+                url: 'http://127.0.0.1:5000/books',
+                method: 'GET',
+                success: function(result) {
+                    let table = '<table>';
+                    table += '<tr><th>ID</th><th>Title</th><th>Author</th><th>Price</th></tr>';
+                    result.forEach(function(book) {
+                        table += `<tr>
+                                    <td>${book.id}</td>
+                                    <td>${book.Title}</td>
+                                    <td>${book.Author}</td>
+                                    <td>${book.Price}</td>
+                                  </tr>`;
+                    });
+                    table += '</table>';
+                    $('#allBooks').html(table);
+                }
+            });
+        });
+
+        // Get book by ID
+        $('#getBookById').click(function() {
+            const bookId = $('#getBookId').val();
+            $.ajax({
+                url: `http://127.0.0.1:5000/books/${bookId}`,
+                method: 'GET',
+                success: function(result) {
+                    $('#bookById').text(JSON.stringify(result, null, 2));
+                }
+            });
+        });
+
+        // Add a new book
+        $('#addBook').click(function() {
+            const newBook = {
+                Title: $('#newBookTitle').val(),
+                Author: $('#newBookAuthor').val(),
+                Price: $('#newBookPrice').val()
+            };
+            $.ajax({
+                url: 'http://127.0.0.1:5000/books',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(newBook),
+                success: function(result) {
+                    $('#addBookResponse').text(JSON.stringify(result, null, 2));
+                }
+            });
+        });
+
+        // Update a book
+        $('#updateBook').click(function() {
+            const bookId = $('#updateBookId').val();
+            const updatedBook = {
+                Title: $('#updateBookTitle').val(),
+                Author: $('#updateBookAuthor').val(),
+                Price: $('#updateBookPrice').val()
+            };
+            $.ajax({
+                url: `http://127.0.0.1:5000/books/${bookId}`,
+                method: 'PUT',
+                contentType: 'application/json',
+                data: JSON.stringify(updatedBook),
+                success: function(result) {
+                    $('#updateBookResponse').text(JSON.stringify(result, null, 2));
+                }
+            });
+        });
+
+        // Delete a book
+        $('#deleteBook').click(function() {
+            const bookId = $('#deleteBookId').val();
+            $.ajax({
+                url: `http://127.0.0.1:5000/books/${bookId}`,
+                method: 'DELETE',
+                success: function(result) {
+                    $('#deleteBookResponse').text(JSON.stringify(result, null, 2));
+                }
+            });
+        });
+    </script>
+</body>
+</html>
