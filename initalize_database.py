@@ -1,3 +1,4 @@
+from aircraft_DAO import aircraftDAO
 import mysql.connector
 
 # The SQL for creating the table
@@ -16,12 +17,6 @@ CREATE TABLE IF NOT EXISTS aircraft (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
-"""
-
-# The SQL for inserting a single row (placeholders for values)
-insert_data_query = """
-INSERT INTO aircraft (model_name, manufacturer, aircraft_serial_number, configuration, last_flight, certificate_of_airworthiness, country_of_origin, country_of_registration, engine_type)
-VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);
 """
 
 # The data to be inserted
@@ -79,47 +74,76 @@ aircraft_data = [
 ###
 ### Creating the Database
 ###
-# estblishing connection with the mysql server
-mydb = mysql.connector.connect(
-    host="localhost", user="root",
-    password=""
-)
+def create_db():
+    # estblishing connection with the mysql server
+    mydb = mysql.connector.connect(
+        host="localhost", user="root",
+        password=""
+    )
 
-# initalising the connection in mycursor
-mycursor = mydb.cursor()
-# executing SQL to create the database
-mycursor.execute("CREATE DATABASE IF NOT EXISTS aircraft_database")
-# Closing the cursor
-mycursor.close()
-# Closing the mysql connection
-mydb.close()
-# Checking the code got this far
-print("Database Created")
+    # initalising the connection in mycursor
+    mycursor = mydb.cursor()
+    # executing SQL to create the database
+    mycursor.execute("CREATE DATABASE IF NOT EXISTS aircraft_database")
+    # Closing the cursor
+    mycursor.close()
+    # Closing the mysql connection
+    mydb.close()
+    # Checking the code got this far
+    print("Database Created 1")
 
 ###
 ### Creating the Table
 ###
-# Connecting to the database created above
-mydb = mysql.connector.connect(
-    host="localhost", user="root",
-    password="", database="aircraft_database"
-)
+def create_table():
+    # Connecting to the database created above
+    mydb = mysql.connector.connect(
+        host="localhost", user="root",
+        password="", database="aircraft_database"
+    )
 
-# initalising the connection in mycursor
-mycursor = mydb.cursor()
-# executing SQL to create the table
-mycursor.execute(create_table_query)
-print("Table Created")
+    # initalising the connection in mycursor
+    mycursor = mydb.cursor()
+    # executing SQL to create the table
+    mycursor.execute(create_table_query)
+    # Closing the cursor
+    mycursor.close()
+    # Closing the mysql connection
+    mydb.close()
+    print("Table Created 2")
 
 ###
 ### Populating the table
 ###
-for aircraft in aircraft_data:
-    mycursor.execute(insert_data_query, aircraft)
-    print("Inserted ID:", mycursor.lastrowid)
+def populate_table():
+    global aircraft_data
 
-mydb.commit()
-mycursor.close()
-mydb.close()
+    for aircraft in aircraft_data:
+        aircraftDAO.create( aircraft)
+    print("Table has been populated 3")
 
-print("Table has been populated")
+###
+### Check if Database Exists, Drop if it does
+###
+def check_and_drop_db():
+    # Establishing connection with the MySQL server
+    mydb = mysql.connector.connect(
+        host="localhost", user="root",
+        password=""
+    )
+    mycursor = mydb.cursor()
+    
+    # Check if the database exists
+    mycursor.execute("SHOW DATABASES LIKE 'aircraft_database'")
+    result = mycursor.fetchone()
+    
+    if result:
+        # Drop the database if it exists
+        mycursor.execute("DROP DATABASE aircraft_database")
+        print("Database 'aircraft_database' dropped.")
+    else:
+        print("Database 'aircraft_database' does not exist, proceeding to create it.")
+    
+    # Closing the cursor and connection
+    mycursor.close()
+    mydb.close()

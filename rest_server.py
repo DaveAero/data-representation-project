@@ -1,15 +1,15 @@
 from flask import Flask, url_for, request, redirect, abort, jsonify
+from aircraft_DAO import aircraftDAO
+import initalize_database
+
+print("0")
+initalize_database.check_and_drop_db()
+initalize_database.create_db()
+initalize_database.create_table()
+initalize_database.populate_table()
+print("4")
 
 app = Flask(__name__, static_url_path='', static_folder='staticpages')
-
-# Database in memory for now
-books=[
-    {"id": 1, "Title": "Harry Potter", "Author": "JK", "Price": 1000},
-    {"id": 2, "Title": "some cook book", "Author": "Mr Angry Man", "Price": 2000},
-    {"id": 3, "Title": "Python made easy", "Author": "Some Liar", "Price": 1500}
-]
-nextId=4
-
 
 # at the root page of the server
 @app.route('/')
