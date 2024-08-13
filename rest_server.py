@@ -2,12 +2,12 @@ from flask import Flask, url_for, request, redirect, abort, jsonify
 from aircraft_DAO import aircraftDAO
 import initalize_database
 
-print("0")
+#print("0")
 initalize_database.check_and_drop_db()
 initalize_database.create_db()
 initalize_database.create_table()
 initalize_database.populate_table()
-print("4")
+#print("4")
 
 app = Flask(__name__, static_url_path='', static_folder='staticpages')
 
@@ -18,83 +18,78 @@ def index():
     # This text is displated in the HTML browser
     return "hello"
 
-# at the url /books
-@app.route('/books')
-def getAll():
-    # this is displayed in the HTML browser
-    return jsonify(books)
+# Retrieve all aircraft
+@app.route('/aircraft')
+def getAllAircraft():
+    aircraft_list = aircraftDAO.getAll()
+    return jsonify(aircraft_list)
 
-# Find by id
-@app.route('/books/<int:id>')
-def finByid(id):
-    # saving found items into an object
-    foundBooks = list(filter (lambda t : t["id"] == id, books))
-    # if no items found, return the empty list
-    if len(foundBooks) == 0:
-        return jsonify({}) , 204
-    # else return the found item
-    return jsonify(foundBooks[0])
+# Retrieve aircraft by id
+@app.route('/aircraft/<int:id>')
+def findAircraftById(id):
+    aircraft = aircraftDAO.findByID(id)
+    if aircraft is None:
+        return jsonify({}), 204
+    return jsonify(aircraft)
 
 
-# Create a book
-# curl -X "POST" -H "content-type:application/json" -d "{\"Title\":\"test\", \"Author\":\"some guy\", \"Price\":123}" http://127.0.0.1:5000/books
-@app.route('/books', methods=['POST'])
-def create():
-    global nextId
-
-    # Check if the data being sent is in json format
+# Create a aircraft
+### curl -X "POST" -H "content-type:application/json" -d "{\"Title\":\"test\", \"Author\":\"some guy\", \"Price\":123}" http://127.0.0.1:5000/books
+@app.route('/aircraft', methods=['POST'])
+def createAircraft():
     if not request.json:
-        # if not abort
         abort(400)
-
-    book = {
-        "id" : nextId,
-        "Title" : request.json["Title"], 
-        "Author" : request.json["Author"],
-        "Price" : request.json["Price"]
+    aircraft = {
+        "model_name": request.json.get("model_name"),
+        "manufacturer": request.json.get("manufacturer"),
+        "aircraft_serial_number": request.json.get("aircraft_serial_number"),
+        "configuration": request.json.get("configuration"),
+        "last_flight": request.json.get("last_flight"),
+        "certificate_of_airworthiness": request.json.get("certificate_of_airworthiness"),
+        "country_of_origin": request.json.get("country_of_origin"),
+        "country_of_registration": request.json.get("country_of_registration"),
+        "engine_type": request.json.get("engine_type"),
     }
+    aircraft_id = aircraftDAO.create(tuple(aircraft.values()))
+    aircraft["aircraft_id"] = aircraft_id
+    return jsonify(aircraft), 201
 
-    books.append(book)
-    nextId += 1
-
-    return jsonify(book)
-
-# Update a value
+# Update existing aircraft
 # curl -X "PUT" -d "{\"Title\":\"New Title\", \"Price\":999}" -H "content-type:application/json" http://127.0.0.1:5000/books/1
-@app.route('/books/<int:id>', methods=['PUT'])
-def update(id):
-    foundBooks = list(filter (lambda t : t["id"] == id, books))
-    # if no items found, return the empty list
-    if len(foundBooks) == 0:
-        return jsonify({}) , 404
+@app.route('/aircraft/<int:id>', methods=['PUT'])
+def updateAircraft(id):
+    aircraft = aircraftDAO.findByID(id)
+    if aircraft is None:
+        return jsonify({}), 404
     
-    # the found book
-    currentBook = foundBooks[0]
-
-    # Updating all the attributes included in the PUT request
-    if "Title" in request.json:
-        currentBook["Title"] = request.json["Title"]
-
-    if "Author" in request.json:
-        currentBook["Author"] = request.json["Author"]
+    if not request.json:
+        abort(400)
     
-    if "Price" in request.json:
-        currentBook["Price"] = request.json["Price"]
-
-    # Return the updated book to the client and the database
-    return jsonify(currentBook)
-
-# Delete a book
-@app.route('/books/<int:id>', methods=['DELETE'])
-def delete(id):
-    foundBooks = list(filter (lambda t : t["id"] == id, books))
-    # if no items found, return the empty list
-    if len(foundBooks) == 0:
-        return jsonify({}) , 404
+    updated_aircraft = {
+        "model_name": request.json.get("model_name", aircraft[1]),
+        "manufacturer": request.json.get("manufacturer", aircraft[2]),
+        "aircraft_serial_number": request.json.get("aircraft_serial_number", aircraft[3]),
+        "configuration": request.json.get("configuration", aircraft[4]),
+        "last_flight": request.json.get("last_flight", aircraft[5]),
+        "certificate_of_airworthiness": request.json.get("certificate_of_airworthiness", aircraft[6]),
+        "country_of_origin": request.json.get("country_of_origin", aircraft[7]),
+        "country_of_registration": request.json.get("country_of_registration", aircraft[8]),
+        "engine_type": request.json.get("engine_type", aircraft[9]),
+        "aircraft_id": id
+    }
     
-    books.remove(foundBooks[0])
+    aircraftDAO.update(tuple(updated_aircraft.values()) + (id,))
+    return jsonify(updated_aircraft)
+
+# Delete aircraft
+@app.route('/aircraft/<int:id>', methods=['DELETE'])
+def deleteAircraft(id):
+    aircraft = aircraftDAO.findByID(id)
+    if aircraft is None:
+        return jsonify({}), 404
     
-    return jsonify({"done":True})
+    aircraftDAO.delete(id)
+    return jsonify({"result": True})
 
 if __name__ == "__main__":
     app.run(debug=True)
