@@ -27,7 +27,7 @@
         </div>
         <div id='createUpdateForm' style="display: none">
             <h2><span id="createLabel">Create a</span> <span id="updateLabel">Update</span> Aircraft</h2>
-            <input type="hidden" name="id"/>
+            <input id="updateLabel" type="hidden" name="id"/>
             Model Name: <input type="text" name="model_name" /><br/>
             Manufacturer: <input type="text" name="manufacturer"/> <br/>
             Serial Number: <input type="number" name="aircraft_serial_number"/> <br/>
@@ -78,19 +78,19 @@
 
     function doCreate(){
         var form = document.getElementById('createUpdateForm')
-        var aircraft = {}
+        var newAircraft = {}
+        
+        newAircraft.model_name = form.querySelector('input[name="model_name"]').value
+        newAircraft.manufacturer = form.querySelector('input[name="manufacturer"]').value
+        newAircraft.aircraft_serial_number = form.querySelector('input[name="aircraft_serial_number"]').value
+        newAircraft.configuration = form.querySelector('input[name="configuration"]').value
+        newAircraft.last_flight = form.querySelector('input[name="last_flight"]').value
+        newAircraft.certificate_of_airworthiness = form.querySelector('input[name="certificate_of_airworthiness"]').checked
+        newAircraft.country_of_origin = form.querySelector('input[name="country_of_origin"]').value
+        newAircraft.country_of_registration = form.querySelector('input[name="country_of_registration"]').value
+        newAircraft.engine_type = form.querySelector('input[name="engine_type"]').value
 
-        aircraft.model_name = form.querySelector('input[name="model_name"]').value
-        aircraft.manufacturer = form.querySelector('input[name="manufacturer"]').value
-        aircraft.aircraft_serial_number = form.querySelector('input[name="aircraft_serial_number"]').value
-        aircraft.configuration = form.querySelector('input[name="configuration"]').value
-        aircraft.last_flight = form.querySelector('input[name="last_flight"]').value
-        aircraft.certificate_of_airworthiness = form.querySelector('input[name="certificate_of_airworthiness"]').checked
-        aircraft.country_of_origin = form.querySelector('input[name="country_of_origin"]').value
-        aircraft.country_of_registration = form.querySelector('input[name="country_of_registration"]').value
-        aircraft.engine_type = form.querySelector('input[name="engine_type"]').value
-
-        createAircraftAjax(aircraft)
+        createAircraftAjax(newAircraft)
     }
 
     function doUpdate(){
@@ -239,6 +239,7 @@
     }
 
     function createAircraftAjax(aircraft){
+        console.log(aircraft);
         $.ajax({
             "url": "http://127.0.0.1:5000/aircraft",
             "method":"POST",
