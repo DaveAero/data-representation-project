@@ -76,7 +76,6 @@ def createAircraft():
 # curl -X "PUT" -d "{\"Title\":\"New Title\", \"Price\":999}" -H "content-type:application/json" http://127.0.0.1:5000/books/1
 @app.route('/aircraft/<int:id>', methods=['PUT'])
 def updateAircraft(id):
-    print(id)
     aircraft = aircraftDAO.findByID(id)
     if aircraft is None:
         return jsonify({}), 404
@@ -84,21 +83,40 @@ def updateAircraft(id):
     if not request.json:
         abort(400)
     
-    updated_aircraft = {
-        "model_name": request.json.get("model_name", aircraft[1]),
-        "manufacturer": request.json.get("manufacturer", aircraft[2]),
-        "aircraft_serial_number": request.json.get("aircraft_serial_number", aircraft[3]),
-        "configuration": request.json.get("configuration", aircraft[4]),
-        "last_flight": request.json.get("last_flight", aircraft[5]),
-        "certificate_of_airworthiness": request.json.get("certificate_of_airworthiness", aircraft[6]),
-        "country_of_origin": request.json.get("country_of_origin", aircraft[7]),
-        "country_of_registration": request.json.get("country_of_registration", aircraft[8]),
-        "engine_type": request.json.get("engine_type", aircraft[9]),
-        "aircraft_id": id
+    # Convert the tuple returned by findByID to a dictionary
+    foundAircraft = {
+        "model_name": aircraft[1],
+        "manufacturer": aircraft[2],
+        "aircraft_serial_number": aircraft[3],
+        "configuration": aircraft[4],
+        "last_flight": aircraft[5],
+        "certificate_of_airworthiness": aircraft[6],
+        "country_of_origin": aircraft[7],
+        "country_of_registration": aircraft[8],
+        "engine_type": aircraft[9],
+        "aircraft_id": aircraft[0]
     }
+
+    reqJson = request.json
+
+    # Update the dictionary with the new values from the request
+    foundAircraft['model_name'] = reqJson.get('model_name', foundAircraft['model_name'])
+    foundAircraft['manufacturer'] = reqJson.get('manufacturer', foundAircraft['manufacturer'])
+    foundAircraft['aircraft_serial_number'] = reqJson.get('aircraft_serial_number', foundAircraft['aircraft_serial_number'])
+    foundAircraft['configuration'] = reqJson.get('configuration', foundAircraft['configuration'])
+    foundAircraft['last_flight'] = reqJson.get('last_flight', foundAircraft['last_flight'])
+    foundAircraft['certificate_of_airworthiness'] = reqJson.get('certificate_of_airworthiness', foundAircraft['certificate_of_airworthiness'])
+    foundAircraft['country_of_origin'] = reqJson.get('country_of_origin', foundAircraft['country_of_origin'])
+    foundAircraft['country_of_registration'] = reqJson.get('country_of_registration', foundAircraft['country_of_registration'])
+    foundAircraft['engine_type'] = reqJson.get('engine_type', foundAircraft['engine_type'])
+
+    updated_aircraft = tuple(foundAircraft.values())
+
+    # Pass the tuple to the update method
+    print(updated_aircraft)
+    aircraftDAO.update(updated_aircraft)
     
-    aircraftDAO.update(tuple(updated_aircraft.values()) + (id,))
-    return jsonify(updated_aircraft)
+    return jsonify(foundAircraft)
 
 # Delete aircraft
 @app.route('/aircraft/<int:id>', methods=['DELETE'])

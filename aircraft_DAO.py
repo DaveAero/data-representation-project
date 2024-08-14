@@ -80,11 +80,16 @@ class AircraftDAO:
     def update(self, values):
         cursor = self.getCursor()
         sql = """
-        UPDATE aircraft 
-        SET model_name = %s, manufacturer = %s, aircraft_serial_number = %s, 
-            configuration = %s, last_flight = %s, 
-            certificate_of_airworthiness = %s, country_of_origin = %s, 
-            country_of_registration = %s, engine_type = %s 
+        UPDATE aircraft
+        SET model_name = %s, 
+            manufacturer = %s, 
+            aircraft_serial_number = %s, 
+            configuration = %s, 
+            last_flight = %s, 
+            certificate_of_airworthiness = %s, 
+            country_of_origin = %s, 
+            country_of_registration = %s, 
+            engine_type = %s
         WHERE aircraft_id = %s
         """
         cursor.execute(sql, values)

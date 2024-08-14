@@ -95,7 +95,9 @@
 
     function doUpdate(){
         var aircraft = getAircraftFromForm();
-        var rowElement = document.getElementById(aircraft.id);
+        console.log(aircraft);
+        console.log("Here 1.")
+        var rowElement = document.getElementById(aircraft.aircraft_id);
         updateAircraftAjax(aircraft);
         setAircraftInRow(rowElement, aircraft);
 
@@ -184,35 +186,38 @@
     }
 
     function populateFormWithAircraft(aircraft){
-        var form = document.getElementById('createUpdateForm')
+        var form = document.getElementById('createUpdateForm');
 
-        form.querySelector('input[name="id"]').disabled = true
-        form.querySelector('input[name="model_name"]').value= aircraft.model_name
-        form.querySelector('input[name="manufacturer"]').value= aircraft.manufacturer
-        form.querySelector('input[name="aircraft_serial_number"]').value= aircraft.aircraft_serial_number
-        form.querySelector('input[name="configuration"]').value= aircraft.configuration
-        form.querySelector('input[name="last_flight"]').value= aircraft.last_flight
-        form.querySelector('input[name="certificate_of_airworthiness"]').checked= aircraft.certificate_of_airworthiness
-        form.querySelector('input[name="country_of_origin"]').value= aircraft.country_of_origin
-        form.querySelector('input[name="country_of_registration"]').value= aircraft.country_of_registration
-        form.querySelector('input[name="engine_type"]').value= aircraft.engine_type
-        return aircraft
+        form.querySelector('input[name="id"]').disabled = false; 
+        form.querySelector('input[name="id"]').value = aircraft.aircraft_id;
+        form.querySelector('input[name="model_name"]').value = aircraft.model_name;
+        form.querySelector('input[name="manufacturer"]').value = aircraft.manufacturer;
+        form.querySelector('input[name="aircraft_serial_number"]').value = aircraft.aircraft_serial_number;
+        form.querySelector('input[name="configuration"]').value = aircraft.configuration;
+        form.querySelector('input[name="last_flight"]').value = aircraft.last_flight;
+        form.querySelector('input[name="certificate_of_airworthiness"]').checked = aircraft.certificate_of_airworthiness;
+        form.querySelector('input[name="country_of_origin"]').value = aircraft.country_of_origin;
+        form.querySelector('input[name="country_of_registration"]').value = aircraft.country_of_registration;
+        form.querySelector('input[name="engine_type"]').value = aircraft.engine_type;
+        return aircraft;
     }
 
     function getAircraftFromForm(){
-        var form = document.getElementById('createUpdateForm')
-        var aircraft = {}
-        aircraft.aircraft_id = form.querySelector('input[name="id"]').value
-        aircraft.model_name = form.querySelector('input[name="model_name"]').value
-        aircraft.manufacturer = form.querySelector('input[name="manufacturer"]').value
-        aircraft.aircraft_serial_number = form.querySelector('input[name="aircraft_serial_number"]').value
-        aircraft.configuration = form.querySelector('input[name="configuration"]').value
-        aircraft.last_flight = form.querySelector('input[name="last_flight"]').value
-        aircraft.certificate_of_airworthiness = form.querySelector('input[name="certificate_of_airworthiness"]').checked
-        aircraft.country_of_origin = form.querySelector('input[name="country_of_origin"]').value
-        aircraft.country_of_registration = form.querySelector('input[name="country_of_registration"]').value
-        aircraft.engine_type = form.querySelector('input[name="engine_type"]').value
-        return aircraft
+        var form = document.getElementById('createUpdateForm');
+        var aircraft = {};
+
+        aircraft.aircraft_id = form.querySelector('input[name="id"]').value;
+        aircraft.model_name = form.querySelector('input[name="model_name"]').value;
+        aircraft.manufacturer = form.querySelector('input[name="manufacturer"]').value;
+        aircraft.aircraft_serial_number = form.querySelector('input[name="aircraft_serial_number"]').value;
+        aircraft.configuration = form.querySelector('input[name="configuration"]').value;
+        aircraft.last_flight = form.querySelector('input[name="last_flight"]').value;
+        aircraft.certificate_of_airworthiness = form.querySelector('input[name="certificate_of_airworthiness"]').checked;
+        aircraft.country_of_origin = form.querySelector('input[name="country_of_origin"]').value;
+        aircraft.country_of_registration = form.querySelector('input[name="country_of_registration"]').value;
+        aircraft.engine_type = form.querySelector('input[name="engine_type"]').value;
+
+        return aircraft;
     }
 
     function getAllAjax(){
@@ -254,6 +259,8 @@
 
     function updateAircraftAjax(aircraft){
         console.log(aircraft.aircraft_id);
+        console.log(aircraft);
+        console.log(JSON.stringify(aircraft));
         $.ajax({
             "url": "http://127.0.0.1:5000/aircraft/"+encodeURI(aircraft.aircraft_id),
             "method":"PUT",
