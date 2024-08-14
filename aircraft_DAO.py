@@ -49,7 +49,20 @@ class AircraftDAO:
 
     def getAll(self):
         cursor = self.getCursor()
-        sql = "SELECT * FROM aircraft"
+        sql = """
+        SELECT 
+            aircraft_id,
+            model_name,
+            manufacturer,
+            aircraft_serial_number,
+            configuration,
+            DATE_FORMAT(last_flight, '%Y-%m-%d') AS last_flight,  
+            certificate_of_airworthiness,
+            country_of_origin,
+            country_of_registration,
+            engine_type
+        FROM aircraft;
+        """
         cursor.execute(sql)
         result = cursor.fetchall()
         self.closeAll()

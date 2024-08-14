@@ -76,6 +76,7 @@ def createAircraft():
 # curl -X "PUT" -d "{\"Title\":\"New Title\", \"Price\":999}" -H "content-type:application/json" http://127.0.0.1:5000/books/1
 @app.route('/aircraft/<int:id>', methods=['PUT'])
 def updateAircraft(id):
+    print(id)
     aircraft = aircraftDAO.findByID(id)
     if aircraft is None:
         return jsonify({}), 404

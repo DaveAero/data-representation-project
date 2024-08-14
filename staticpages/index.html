@@ -32,7 +32,7 @@
             Manufacturer: <input type="text" name="manufacturer"/> <br/>
             Serial Number: <input type="number" name="aircraft_serial_number"/> <br/>
             Configuration: <input type="number" name="configuration"/> <br/>
-            Last Flight: <input type="date" placeholder="dd-mm-yyyy" name="last_flight"/> <br/>
+            Last Flight: <input type="date" name="last_flight"/> <br/>
             Airworthiness: <input type="checkbox" name="certificate_of_airworthiness"/> <br/>
             Country of Origin: <input type="text" name="country_of_origin"/> <br/>
             Country of Registration: <input type="text" name="country_of_registration"/> <br/>
@@ -116,14 +116,6 @@
         var rowElement = tableElement.insertRow(-1)
         rowElement.setAttribute('id', aircraft.aircraft_id)
 
-        // Format the last_flight date
-        let lastFlightDate = new Date(aircraft.last_flight);
-        let formattedDate = lastFlightDate.toLocaleDateString('en-GB', {
-            day: '2-digit',
-            month: 'short',
-            year: '2-digit'
-        });
-
         var cell1 = rowElement.insertCell(0);
         cell1.innerHTML = aircraft.aircraft_id
         var cell2 = rowElement.insertCell(1);
@@ -193,8 +185,8 @@
 
     function populateFormWithAircraft(aircraft){
         var form = document.getElementById('createUpdateForm')
-        form.querySelector('input[name="id"]').disabled = true
 
+        form.querySelector('input[name="id"]').disabled = true
         form.querySelector('input[name="model_name"]').value= aircraft.model_name
         form.querySelector('input[name="manufacturer"]').value= aircraft.manufacturer
         form.querySelector('input[name="aircraft_serial_number"]').value= aircraft.aircraft_serial_number
@@ -261,6 +253,7 @@
     }
 
     function updateAircraftAjax(aircraft){
+        console.log(aircraft.aircraft_id);
         $.ajax({
             "url": "http://127.0.0.1:5000/aircraft/"+encodeURI(aircraft.aircraft_id),
             "method":"PUT",
