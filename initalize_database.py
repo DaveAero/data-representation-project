@@ -13,9 +13,7 @@ CREATE TABLE IF NOT EXISTS aircraft (
     certificate_of_airworthiness BOOLEAN DEFAULT TRUE, -- Is the aircraft currently servicable?
     country_of_origin VARCHAR(100), -- Country where the aircraft was manufactured
     country_of_registration VARCHAR(100), -- Country where the aircraft is registered
-    engine_type VARCHAR(100), -- Type of engine
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    engine_type VARCHAR(100) -- Type of engine
 );
 """
 
@@ -90,7 +88,7 @@ def create_db():
     # Closing the mysql connection
     mydb.close()
     # Checking the code got this far
-    print("Database Created 1")
+    print("Database Created")
 
 ###
 ### Creating the Table
@@ -110,7 +108,7 @@ def create_table():
     mycursor.close()
     # Closing the mysql connection
     mydb.close()
-    print("Table Created 2")
+    print("Table Created")
 
 ###
 ### Populating the table
@@ -120,10 +118,10 @@ def populate_table():
 
     for aircraft in aircraft_data:
         aircraftDAO.create( aircraft)
-    print("Table has been populated 3")
+    print("Table has been populated")
 
 ###
-### Check if Database Exists, Drop if it does
+### Check if Database already exists, Drop if it does
 ###
 def check_and_drop_db():
     # Establishing connection with the MySQL server

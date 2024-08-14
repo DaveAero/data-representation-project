@@ -1,144 +1,297 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bookstore API Interaction</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <style>
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        table, th, td {
-            border: 1px solid black;
-        }
-        th, td {
-            padding: 10px;
-            text-align: left;
-        }
-    </style>
-</head>
-<body>
-    <h1>Bookstore API Interaction</h1>
-
-    <!-- Get all books -->
-    <button id="getAllBooks">Get All Books</button>
-    <div id="allBooks"></div>
-
-    <!-- Get book by ID -->
-    <h3>Get Book by ID</h3>
-    <input type="number" id="getBookId" placeholder="Enter book ID">
-    <button id="getBookById">Get Book</button>
-    <div id="bookById"></div>
-
-    <!-- Add a new book -->
-    <h3>Add a New Book</h3>
-    <input type="text" id="newBookTitle" placeholder="Title">
-    <input type="text" id="newBookAuthor" placeholder="Author">
-    <input type="number" id="newBookPrice" placeholder="Price">
-    <button id="addBook">Add Book</button>
-    <div id="addBookResponse"></div>
-
-    <!-- Update a book -->
-    <h3>Update Book by ID</h3>
-    <input type="number" id="updateBookId" placeholder="Enter book ID">
-    <input type="text" id="updateBookTitle" placeholder="New Title">
-    <input type="text" id="updateBookAuthor" placeholder="New Author">
-    <input type="number" id="updateBookPrice" placeholder="New Price">
-    <button id="updateBook">Update Book</button>
-    <div id="updateBookResponse"></div>
-
-    <!-- Delete a book -->
-    <h3>Delete Book by ID</h3>
-    <input type="number" id="deleteBookId" placeholder="Enter book ID">
-    <button id="deleteBook">Delete Book</button>
-    <div id="deleteBookResponse"></div>
-
+<html>
+    <head>
+        <title>View Aircraft</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    </head>
+    <body>
+        <h1>Aircraft</h1>
+        <div> <button id="showCreateButton" onclick="showCreate()">Create</button></div>
+        <div>
+            <table class="table" id="aircraftTable">
+                <tr>
+                    <th>ID</th>
+                    <th>Model Name</th>
+                    <th>Manufacturer</th>
+                    <th>Serial Number</th>
+                    <th>Configuration</th>
+                    <th>Last Flight</th>
+                    <th>Certificate of Airworthiness</th>
+                    <th>Country of Manufacture</th>
+                    <th>Country of Registration</th>
+                    <th>Engine Type</th>
+                    <th>Update</th>
+                    <th>Delete</th>
+                </tr>
+            </table>
+        </div>
+        <div id='createUpdateForm' style="display: none">
+            <h2><span id="createLabel">Create a</span> <span id="updateLabel">Update</span> Aircraft</h2>
+            <input type="hidden" name="id"/>
+            Model Name: <input type="text" name="model_name" /><br/>
+            Manufacturer: <input type="text" name="manufacturer"/> <br/>
+            Serial Number: <input type="number" name="aircraft_serial_number"/> <br/>
+            Configuration: <input type="number" name="configuration"/> <br/>
+            Last Flight: <input type="date" placeholder="dd-mm-yyyy" name="last_flight"/> <br/>
+            Airworthiness: <input type="checkbox" name="certificate_of_airworthiness"/> <br/>
+            Country of Origin: <input type="text" name="country_of_origin"/> <br/>
+            Country of Registration: <input type="text" name="country_of_registration"/> <br/>
+            Engine Type: <input type="text" name="engine_type"/> <br/>
+            <span><button id="doCreateButton" onclick="doCreate()">Create</button></span>
+            <span><button id="doUpdateButton" onclick="doUpdate()">Update</button></span>
+        </div>
+    </body>
     <script>
-        // Get all books and display them in a table
-        $('#getAllBooks').click(function() {
-            $.ajax({
-                url: 'http://127.0.0.1:5000/books',
-                method: 'GET',
-                success: function(result) {
-                    let table = '<table>';
-                    table += '<tr><th>ID</th><th>Title</th><th>Author</th><th>Price</th></tr>';
-                    result.forEach(function(book) {
-                        table += `<tr>
-                                    <td>${book.id}</td>
-                                    <td>${book.Title}</td>
-                                    <td>${book.Author}</td>
-                                    <td>${book.Price}</td>
-                                  </tr>`;
-                    });
-                    table += '</table>';
-                    $('#allBooks').html(table);
-                }
-            });
+    function showCreate(){
+        document.getElementById('showCreateButton').style.display="none"
+        document.getElementById('aircraftTable').style.display="none"
+        document.getElementById('createUpdateForm').style.display="block"
+
+        document.getElementById('createLabel').style.display="inline"
+        document.getElementById('updateLabel').style.display="none"
+
+        document.getElementById('doCreateButton').style.display="block"
+        document.getElementById('doUpdateButton').style.display="none"
+    }
+
+    function showViewAll(){
+        document.getElementById('showCreateButton').style.display="block"
+        document.getElementById('aircraftTable').style.display="block"
+        document.getElementById('createUpdateForm').style.display="none"
+    }
+
+    function showUpdate(buttonElement){
+        document.getElementById('showCreateButton').style.display="none"
+        document.getElementById('aircraftTable').style.display="none"
+        document.getElementById('createUpdateForm').style.display="block"
+
+        document.getElementById('createLabel').style.display="none"
+        document.getElementById('updateLabel').style.display="inline"
+
+        document.getElementById('doCreateButton').style.display="none"
+        document.getElementById('doUpdateButton').style.display="block"
+
+        var rowElement = buttonElement.parentNode.parentNode
+        var aircraft = getAircraftFromRow(rowElement)
+        populateFormWithAircraft(aircraft)
+    }
+
+    function doCreate(){
+        var form = document.getElementById('createUpdateForm')
+        var aircraft = {}
+
+        aircraft.model_name = form.querySelector('input[name="model_name"]').value
+        aircraft.manufacturer = form.querySelector('input[name="manufacturer"]').value
+        aircraft.aircraft_serial_number = form.querySelector('input[name="aircraft_serial_number"]').value
+        aircraft.configuration = form.querySelector('input[name="configuration"]').value
+        aircraft.last_flight = form.querySelector('input[name="last_flight"]').value
+        aircraft.certificate_of_airworthiness = form.querySelector('input[name="certificate_of_airworthiness"]').checked
+        aircraft.country_of_origin = form.querySelector('input[name="country_of_origin"]').value
+        aircraft.country_of_registration = form.querySelector('input[name="country_of_registration"]').value
+        aircraft.engine_type = form.querySelector('input[name="engine_type"]').value
+
+        createAircraftAjax(aircraft)
+    }
+
+    function doUpdate(){
+        var aircraft = getAircraftFromForm();
+        var rowElement = document.getElementById(aircraft.id);
+        updateAircraftAjax(aircraft);
+        setAircraftInRow(rowElement, aircraft);
+
+        clearForm();
+        showViewAll();
+    }
+
+    function doDelete(r){
+        var tableElement = document.getElementById('aircraftTable');
+        var rowElement = r.parentNode.parentNode;
+        var index = rowElement.rowIndex;
+        deleteAircraftAjax(rowElement.getAttribute("id"));
+        tableElement.deleteRow(index);
+    }
+
+    function addAircraftToTable(aircraft){
+        var tableElement = document.getElementById('aircraftTable')
+        var rowElement = tableElement.insertRow(-1)
+        rowElement.setAttribute('id', aircraft.aircraft_id)
+
+        // Format the last_flight date
+        let lastFlightDate = new Date(aircraft.last_flight);
+        let formattedDate = lastFlightDate.toLocaleDateString('en-GB', {
+            day: '2-digit',
+            month: 'short',
+            year: '2-digit'
         });
 
-        // Get book by ID
-        $('#getBookById').click(function() {
-            const bookId = $('#getBookId').val();
-            $.ajax({
-                url: `http://127.0.0.1:5000/books/${bookId}`,
-                method: 'GET',
-                success: function(result) {
-                    $('#bookById').text(JSON.stringify(result, null, 2));
-                }
-            });
-        });
+        var cell1 = rowElement.insertCell(0);
+        cell1.innerHTML = aircraft.aircraft_id
+        var cell2 = rowElement.insertCell(1);
+        cell2.innerHTML = aircraft.model_name
+        var cell3 = rowElement.insertCell(2);
+        cell3.innerHTML = aircraft.manufacturer
+        var cell4 = rowElement.insertCell(3);
+        cell4.innerHTML = aircraft.aircraft_serial_number
+        var cell5 = rowElement.insertCell(4);
+        cell5.innerHTML = aircraft.configuration
+        var cell6 = rowElement.insertCell(5);
+        cell6.innerHTML = aircraft.last_flight
+        var cell7 = rowElement.insertCell(6);
+        cell7.innerHTML = aircraft.certificate_of_airworthiness ? "Yes" : "No"
+        var cell8 = rowElement.insertCell(7);
+        cell8.innerHTML = aircraft.country_of_origin
+        var cell9 = rowElement.insertCell(8);
+        cell9.innerHTML = aircraft.country_of_registration
+        var cell10 = rowElement.insertCell(9);
+        cell10.innerHTML = aircraft.engine_type
+        var cell11 = rowElement.insertCell(10);
+        cell11.innerHTML = '<button onclick="showUpdate(this)">Update</button>'
+        var cell12 = rowElement.insertCell(11);
+        cell12.innerHTML = '<button onclick=doDelete(this)>delete</button>'
+    }
 
-        // Add a new book
-        $('#addBook').click(function() {
-            const newBook = {
-                Title: $('#newBookTitle').val(),
-                Author: $('#newBookAuthor').val(),
-                Price: $('#newBookPrice').val()
-            };
-            $.ajax({
-                url: 'http://127.0.0.1:5000/books',
-                method: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(newBook),
-                success: function(result) {
-                    $('#addBookResponse').text(JSON.stringify(result, null, 2));
-                }
-            });
-        });
+    function clearForm(){
+        var form = document.getElementById('createUpdateForm')
 
-        // Update a book
-        $('#updateBook').click(function() {
-            const bookId = $('#updateBookId').val();
-            const updatedBook = {
-                Title: $('#updateBookTitle').val(),
-                Author: $('#updateBookAuthor').val(),
-                Price: $('#updateBookPrice').val()
-            };
-            $.ajax({
-                url: `http://127.0.0.1:5000/books/${bookId}`,
-                method: 'PUT',
-                contentType: 'application/json',
-                data: JSON.stringify(updatedBook),
-                success: function(result) {
-                    $('#updateBookResponse').text(JSON.stringify(result, null, 2));
-                }
-            });
-        });
+        form.querySelector('input[name="model_name"]').value=''
+        form.querySelector('input[name="manufacturer"]').value=''
+        form.querySelector('input[name="aircraft_serial_number"]').value=''
+        form.querySelector('input[name="configuration"]').value=''
+        form.querySelector('input[name="last_flight"]').value=''
+        form.querySelector('input[name="certificate_of_airworthiness"]').checked=false
+        form.querySelector('input[name="country_of_origin"]').value=''
+        form.querySelector('input[name="country_of_registration"]').value=''
+        form.querySelector('input[name="engine_type"]').value=''
+    }
 
-        // Delete a book
-        $('#deleteBook').click(function() {
-            const bookId = $('#deleteBookId').val();
-            $.ajax({
-                url: `http://127.0.0.1:5000/books/${bookId}`,
-                method: 'DELETE',
-                success: function(result) {
-                    $('#deleteBookResponse').text(JSON.stringify(result, null, 2));
+    function getAircraftFromRow(rowElement){
+        var aircraft = {}
+        aircraft.aircraft_id = rowElement.getAttribute('id')
+        aircraft.model_name = rowElement.cells[1].textContent
+        aircraft.manufacturer = rowElement.cells[2].textContent
+        aircraft.aircraft_serial_number = rowElement.cells[3].textContent
+        aircraft.configuration = rowElement.cells[4].textContent
+        aircraft.last_flight = rowElement.cells[5].textContent
+        aircraft.certificate_of_airworthiness = rowElement.cells[6].textContent === "Yes"
+        aircraft.country_of_origin = rowElement.cells[7].textContent
+        aircraft.country_of_registration = rowElement.cells[8].textContent
+        aircraft.engine_type = rowElement.cells[9].textContent
+        return aircraft
+    }
+
+    function setAircraftInRow(rowElement, aircraft){
+        rowElement.cells[1].textContent= aircraft.model_name 
+        rowElement.cells[2].textContent= aircraft.manufacturer
+        rowElement.cells[3].textContent= aircraft.aircraft_serial_number
+        rowElement.cells[4].textContent= aircraft.configuration
+        rowElement.cells[5].textContent= aircraft.last_flight
+        rowElement.cells[6].textContent= aircraft.certificate_of_airworthiness ? "Yes" : "No"
+        rowElement.cells[7].textContent= aircraft.country_of_origin
+        rowElement.cells[8].textContent= aircraft.country_of_registration
+        rowElement.cells[9].textContent= aircraft.engine_type
+    }
+
+    function populateFormWithAircraft(aircraft){
+        var form = document.getElementById('createUpdateForm')
+        form.querySelector('input[name="id"]').disabled = true
+
+        form.querySelector('input[name="model_name"]').value= aircraft.model_name
+        form.querySelector('input[name="manufacturer"]').value= aircraft.manufacturer
+        form.querySelector('input[name="aircraft_serial_number"]').value= aircraft.aircraft_serial_number
+        form.querySelector('input[name="configuration"]').value= aircraft.configuration
+        form.querySelector('input[name="last_flight"]').value= aircraft.last_flight
+        form.querySelector('input[name="certificate_of_airworthiness"]').checked= aircraft.certificate_of_airworthiness
+        form.querySelector('input[name="country_of_origin"]').value= aircraft.country_of_origin
+        form.querySelector('input[name="country_of_registration"]').value= aircraft.country_of_registration
+        form.querySelector('input[name="engine_type"]').value= aircraft.engine_type
+        return aircraft
+    }
+
+    function getAircraftFromForm(){
+        var form = document.getElementById('createUpdateForm')
+        var aircraft = {}
+        aircraft.aircraft_id = form.querySelector('input[name="id"]').value
+        aircraft.model_name = form.querySelector('input[name="model_name"]').value
+        aircraft.manufacturer = form.querySelector('input[name="manufacturer"]').value
+        aircraft.aircraft_serial_number = form.querySelector('input[name="aircraft_serial_number"]').value
+        aircraft.configuration = form.querySelector('input[name="configuration"]').value
+        aircraft.last_flight = form.querySelector('input[name="last_flight"]').value
+        aircraft.certificate_of_airworthiness = form.querySelector('input[name="certificate_of_airworthiness"]').checked
+        aircraft.country_of_origin = form.querySelector('input[name="country_of_origin"]').value
+        aircraft.country_of_registration = form.querySelector('input[name="country_of_registration"]').value
+        aircraft.engine_type = form.querySelector('input[name="engine_type"]').value
+        return aircraft
+    }
+
+    function getAllAjax(){
+        $.ajax({
+            "url": "http://127.0.0.1:5000/aircraft",
+            "method":"GET",
+            "data":"",
+            "dataType": "JSON",
+            "success":function(result){
+                console.log(result);
+                for (aircraft of result){
+                    addAircraftToTable(aircraft);
                 }
-            });
+            },
+            "error":function(xhr,status,error){
+                console.log("error: "+status+" msg:"+error);
+            }
         });
+    }
+
+    function createAircraftAjax(aircraft){
+        $.ajax({
+            "url": "http://127.0.0.1:5000/aircraft",
+            "method":"POST",
+            "data":JSON.stringify(aircraft),
+            "dataType": "JSON",
+            contentType: "application/json; charset=utf-8",
+            "success":function(result){
+                aircraft.aircraft_id = result.aircraft_id
+                addAircraftToTable(aircraft)
+                clearForm()
+                showViewAll()
+            },
+            "error":function(xhr,status,error){
+                console.log("error: "+status+" msg:"+error);
+            }
+        });
+    }
+
+    function updateAircraftAjax(aircraft){
+        $.ajax({
+            "url": "http://127.0.0.1:5000/aircraft/"+encodeURI(aircraft.aircraft_id),
+            "method":"PUT",
+            "data":JSON.stringify(aircraft),
+            "dataType": "JSON",
+            contentType: "application/json; charset=utf-8",
+            "success":function(result){
+                console.log(result);
+            },
+            "error":function(xhr,status,error){
+                console.log("error: "+status+" msg:"+error);
+            }
+        });
+    }
+
+    function deleteAircraftAjax(id){
+        $.ajax({
+            "url": "http://127.0.0.1:5000/aircraft/"+encodeURI(id),
+            "method":"DELETE",
+            "data":"",
+            "dataType": "JSON",
+            contentType: "application/json; charset=utf-8",
+            "success":function(result){
+                console.log(result);
+            },
+            "error":function(xhr,status,error){
+                console.log("error: "+status+" msg:"+error);
+            }
+        });
+    }
+
+    getAllAjax();
     </script>
-</body>
 </html>

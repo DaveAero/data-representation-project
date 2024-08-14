@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>View Aircraft</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+       
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    </head>
+    <body>
+        <h1>Aircraft</h1>
+        <div>
+            <table class="table" id="aircraftTable">
+                <tr>
+                    <th>ID</th>
+                    <th>Model Name</th>
+                    <th>Manufacturer</th>
+                    <th>Serial Number</th>
+                    <th>Configuration</th>
+                    <th>Last Flight</th>
+                    <th>Airworthiness</th>
+                    <th>Country of Origin</th>
+                    <th>Country of Registration</th>
+                    <th>Engine Type</th>
+                    <th>Update</th>
+                    <th>Delete</th>
+                </tr>
+                
+            </table>
+        </div>
+    </body>
+    <script>
+
+    function addAircraftToTable(aircraft){
+        console.log(aircraft); // Debugging line to inspect aircraft object
+        var tableElement = document.getElementById('aircraftTable');
+        var rowElement = tableElement.insertRow(-1);
+        rowElement.setAttribute('id', aircraft.aircraft_id);
+
+        var cell1 = rowElement.insertCell(0);
+        cell1.innerHTML = aircraft.aircraft_id;
+        var cell2 = rowElement.insertCell(1);
+        cell2.innerHTML = aircraft.model_name;
+        var cell3 = rowElement.insertCell(2);
+        cell3.innerHTML = aircraft.manufacturer;
+        var cell4 = rowElement.insertCell(3);
+        cell4.innerHTML = aircraft.aircraft_serial_number;
+        var cell5 = rowElement.insertCell(4);
+        cell5.innerHTML = aircraft.configuration;
+        var cell6 = rowElement.insertCell(5);
+        cell6.innerHTML = aircraft.last_flight;
+        var cell7 = rowElement.insertCell(6);
+        cell7.innerHTML = aircraft.certificate_of_airworthiness ? "Yes" : "No";
+        var cell8 = rowElement.insertCell(7);
+        cell8.innerHTML = aircraft.country_of_origin;
+        var cell9 = rowElement.insertCell(8);
+        cell9.innerHTML = aircraft.country_of_registration;
+        var cell10 = rowElement.insertCell(9);
+        cell10.innerHTML = aircraft.engine_type;
+        var cell11 = rowElement.insertCell(10);
+        cell11.innerHTML = '<button onclick="showUpdate(this)">Update</button>';
+        var cell12 = rowElement.insertCell(11);
+        cell12.innerHTML = '<button onclick=doDelete(this)>delete</button>';
+    }
+    
+    function showViewAll(){
+        document.getElementById('aircraftTable').style.display="block";
+    }
+    
+    function getAllAjax(){
+        $.ajax({
+            "url": "http://127.0.0.1:5000/aircraft",
+            "method":"GET",
+            "data":"",
+            "dataType": "JSON",
+            "success":function(result){
+                //console.log(result); // Debugging line to inspect the result object
+                for (let aircraft of result){
+                    addAircraftToTable(aircraft);
+                }
+            },
+            "error":function(xhr,status,error){
+                console.log("error: " + status + " msg:" + error);
+            }
+        });
+    }
+    
+    getAllAjax();
+    </script>
+</html>

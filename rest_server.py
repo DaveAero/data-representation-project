@@ -22,7 +22,25 @@ def index():
 @app.route('/aircraft')
 def getAllAircraft():
     aircraft_list = aircraftDAO.getAll()
-    return jsonify(aircraft_list)
+
+    # Assuming aircraft_list is a list of tuples, convert it to a list of dictionaries
+    aircraft_data = []
+    for aircraft in aircraft_list:
+        aircraft_dict = {
+            "aircraft_id": aircraft[0],
+            "model_name": aircraft[1],
+            "manufacturer": aircraft[2],
+            "aircraft_serial_number": aircraft[3],
+            "configuration": aircraft[4],
+            "last_flight": aircraft[5],
+            "certificate_of_airworthiness": aircraft[6],
+            "country_of_origin": aircraft[7],
+            "country_of_registration": aircraft[8],
+            "engine_type": aircraft[9]
+        }
+        aircraft_data.append(aircraft_dict)
+
+    return jsonify(aircraft_data)
 
 # Retrieve aircraft by id
 @app.route('/aircraft/<int:id>')
