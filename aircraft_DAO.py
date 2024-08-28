@@ -2,8 +2,8 @@ import mysql.connector
 import dbconfig as cfg
 
 class AircraftDAO:
-    connection=""
-    cursor =''
+    connection= ""
+    cursor =    ''
     host=       ''
     user=       ''
     password=   ''

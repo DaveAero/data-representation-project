@@ -1,5 +1,5 @@
 from aircraft_DAO import aircraftDAO
-import mysql.connector
+import mysql.connector 
 
 # The SQL for creating the table
 create_table_query = """

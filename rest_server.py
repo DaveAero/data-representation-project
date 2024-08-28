@@ -1,32 +1,84 @@
-from flask import Flask, url_for, request, redirect, abort, jsonify
+from flask import Flask, request, redirect, url_for, render_template, session, flash, jsonify
+from werkzeug.security import generate_password_hash, check_password_hash
 from aircraft_DAO import aircraftDAO
 import initalize_database
 
-#print("0")
+# Initalising Database
 initalize_database.check_and_drop_db()
 initalize_database.create_db()
 initalize_database.create_table()
 initalize_database.populate_table()
-#print("4")
 
-app = Flask(__name__, static_url_path='', static_folder='staticpages')
 
+#########################################################################################
+app = Flask(__name__)
+app.secret_key = 'verySecure' 
+
+#########################################################################################
+#Passwords here
+#Passwords here
+#Passwords here
+# A simple in-memory user store
+users = {
+    "admin": generate_password_hash("password123"),  # User 1
+    "andrew": generate_password_hash("streachYourLegs"), # User 2
+    "david": generate_password_hash("myMumHasLitACandle") # User 3
+}
+
+#########################################################################################
 # at the root page of the server
 @app.route('/')
-# this index function will be run
-def index():
-    # This text is displated in the HTML browser
-    return "hello"
+def serveLogin():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    return render_template('aircraft.html')
 
-# Retrieve all aircraft
+#########################################################################################
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+
+        # Check if the username exists and the password matches
+        if username in users and check_password_hash(users[username], password):
+            # Correct credentials, set session and redirect
+            session['username'] = username
+            flash('You were successfully logged in', 'success')
+            return redirect(url_for('aircraftPage'))
+        else:
+            # Incorrect credentials, redirect back to login with a message
+            flash('Invalid username or password', 'danger')
+            return redirect(url_for('login'))
+    
+    # If method is GET, simply render the login page
+    return render_template('login.html')
+
+#########################################################################################
+@app.route('/logout')
+def logout():
+    # Clear the session data
+    session.pop('username', None)
+    flash('You were successfully logged out', 'success')
+    return redirect(url_for('login'))
+
 @app.route('/aircraft')
-def getAllAircraft():
-    aircraft_list = aircraftDAO.getAll()
+def aircraftPage():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    return render_template('aircraft.html')
+
+@app.route('/aircraftdata', methods=['GET'])
+def get_aircraft_data():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    
+    aircraftList = aircraftDAO.getAll()
 
     # Assuming aircraft_list is a list of tuples, convert it to a list of dictionaries
-    aircraft_data = []
-    for aircraft in aircraft_list:
-        aircraft_dict = {
+    aircraftData = []
+    for aircraft in aircraftList:
+        aircraftDict = {
             "aircraft_id": aircraft[0],
             "model_name": aircraft[1],
             "manufacturer": aircraft[2],
@@ -38,23 +90,22 @@ def getAllAircraft():
             "country_of_registration": aircraft[8],
             "engine_type": aircraft[9]
         }
-        aircraft_data.append(aircraft_dict)
-
-    return jsonify(aircraft_data)
-
-# Retrieve aircraft by id
-@app.route('/aircraft/<int:id>')
-def findAircraftById(id):
-    aircraft = aircraftDAO.findByID(id)
-    if aircraft is None:
-        return jsonify({}), 204
-    return jsonify(aircraft)
+        aircraftData.append(aircraftDict)
 
 
-# Create a aircraft
-### curl -X "POST" -H "content-type:application/json" -d "{\"Title\":\"test\", \"Author\":\"some guy\", \"Price\":123}" http://127.0.0.1:5000/books
+    return jsonify(aircraftData)
+
+
+#########################################################################################
+#########################################################################################
+#########################################################################################
+
+# Retrieve all aircraft
 @app.route('/aircraft', methods=['POST'])
 def createAircraft():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+
     if not request.json:
         abort(400)
     aircraft = {
@@ -70,12 +121,30 @@ def createAircraft():
     }
     aircraft_id = aircraftDAO.create(tuple(aircraft.values()))
     aircraft["aircraft_id"] = aircraft_id
+    
     return jsonify(aircraft), 201
 
+
+#########################################################################################
+# Retrieve aircraft by id
+@app.route('/aircraft/<int:id>')
+def findAircraftById(id):
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    
+    aircraft = aircraftDAO.findByID(id)
+    if aircraft is None:
+        return jsonify({}), 204
+    return jsonify(aircraft)  
+
+#########################################################################################
 # Update existing aircraft
 # curl -X "PUT" -d "{\"Title\":\"New Title\", \"Price\":999}" -H "content-type:application/json" http://127.0.0.1:5000/books/1
 @app.route('/aircraft/<int:id>', methods=['PUT'])
 def updateAircraft(id):
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    
     aircraft = aircraftDAO.findByID(id)
     if aircraft is None:
         return jsonify({}), 404
@@ -118,9 +187,13 @@ def updateAircraft(id):
     
     return jsonify(foundAircraft)
 
+#########################################################################################
 # Delete aircraft
 @app.route('/aircraft/<int:id>', methods=['DELETE'])
 def deleteAircraft(id):
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    
     aircraft = aircraftDAO.findByID(id)
     if aircraft is None:
         return jsonify({}), 404
@@ -128,5 +201,8 @@ def deleteAircraft(id):
     aircraftDAO.delete(id)
     return jsonify({"result": True})
 
+#########################################################################################
+#########################################################################################
+#########################################################################################
 if __name__ == "__main__":
     app.run(debug=True)

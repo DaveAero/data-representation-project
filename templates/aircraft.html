@@ -1,44 +1,59 @@
 <html>
     <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>View Aircraft</title>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <style>
+            .logout-btn {
+                position: absolute;
+                top: 20px;
+                right: 20px;
+            }
+        </style>
     </head>
     <body>
-        <h1>Aircraft</h1>
-        <div> <button id="showCreateButton" onclick="showCreate()">Create</button></div>
-        <div>
-            <table class="table" id="aircraftTable">
-                <tr>
-                    <th>ID</th>
-                    <th>Model Name</th>
-                    <th>Manufacturer</th>
-                    <th>Serial Number</th>
-                    <th>Configuration</th>
-                    <th>Last Flight</th>
-                    <th>Certificate of Airworthiness</th>
-                    <th>Country of Manufacture</th>
-                    <th>Country of Registration</th>
-                    <th>Engine Type</th>
-                    <th>Update</th>
-                    <th>Delete</th>
-                </tr>
-            </table>
-        </div>
-        <div id='createUpdateForm' style="display: none">
-            <h2><span id="createLabel">Create a</span> <span id="updateLabel">Update</span> Aircraft</h2>
-            <input id="updateLabel" type="hidden" name="id"/>
-            Model Name: <input type="text" name="model_name" /><br/>
-            Manufacturer: <input type="text" name="manufacturer"/> <br/>
-            Serial Number: <input type="number" name="aircraft_serial_number"/> <br/>
-            Configuration: <input type="number" name="configuration"/> <br/>
-            Last Flight: <input type="date" name="last_flight"/> <br/>
-            Certificate of Airworthiness: <input type="checkbox" name="certificate_of_airworthiness"/> <br/>
-            Country of Origin: <input type="text" name="country_of_origin"/> <br/>
-            Country of Registration: <input type="text" name="country_of_registration"/> <br/>
-            Engine Type: <input type="text" name="engine_type"/> <br/>
-            <span><button id="doCreateButton" onclick="doCreate()">Create</button></span>
-            <span><button id="doUpdateButton" onclick="doUpdate()">Update</button></span>
+        <div class="container">
+            <button class="btn btn-danger logout-btn" onclick="logout()">Logout</button>
+
+            <h1>Aircraft</h1>
+            <div> 
+                <button id="showCreateButton" onclick="showCreate()">Create</button></div>
+            <div>
+                <table class="table" id="aircraftTable">
+                    <tr>
+                        <th>ID</th>
+                        <th>Model Name</th>
+                        <th>Manufacturer</th>
+                        <th>Serial Number</th>
+                        <th>Configuration</th>
+                        <th>Last Flight</th>
+                        <th>Certificate of Airworthiness</th>
+                        <th>Country of Manufacture</th>
+                        <th>Country of Registration</th>
+                        <th>Engine Type</th>
+                        <th>Update</th>
+                        <th>Delete</th>
+                    </tr>
+                </table>
+            </div>
+            <div id='createUpdateForm' style="display: none">
+                <h2><span id="createLabel">Create a</span> <span id="updateLabel">Update</span> Aircraft</h2>
+                <input id="updateLabel" type="hidden" name="id"/>
+                Model Name: <input type="text" name="model_name" /><br/>
+                Manufacturer: <input type="text" name="manufacturer"/> <br/>
+                Serial Number: <input type="number" name="aircraft_serial_number"/> <br/>
+                Configuration: <input type="number" name="configuration"/> <br/>
+                Last Flight: <input type="date" name="last_flight"/> <br/>
+                Certificate of Airworthiness: <input type="checkbox" name="certificate_of_airworthiness"/> <br/>
+                Country of Origin: <input type="text" name="country_of_origin"/> <br/>
+                Country of Registration: <input type="text" name="country_of_registration"/> <br/>
+                Engine Type: <input type="text" name="engine_type"/> <br/>
+                <span><button id="doCreateButton" onclick="doCreate()">Create</button></span>
+                <span><button id="doUpdateButton" onclick="doUpdate()">Update</button></span>
+            </div>
         </div>
     </body>
     <script>
@@ -219,10 +234,24 @@
 
         return aircraft;
     }
+    
+    function logout() {
+        $.ajax({
+            url: "http://127.0.0.1:5000/logout",
+            method: "GET",
+            success: function() {
+                // Redirect to the login page after successful logout
+                window.location.href = "http://127.0.0.1:5000/login";
+            },
+            error: function(xhr, status, error) {
+                console.log("Logout error: " + status + " " + error);
+            }
+        });
+    }
 
     function getAllAjax(){
         $.ajax({
-            "url": "http://127.0.0.1:5000/aircraft",
+            "url": "http://127.0.0.1:5000/aircraftdata",
             "method":"GET",
             "data":"",
             "dataType": "JSON",
