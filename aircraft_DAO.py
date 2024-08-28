@@ -1,6 +1,14 @@
+# rest_server.py
+# By David Burke
+
+
+#########################################################################################
+# Import required functions
 import mysql.connector
 import dbconfig as cfg
 
+#########################################################################################
+# The Main AircraftDAO class
 class AircraftDAO:
     connection= ""
     cursor =    ''
@@ -10,12 +18,19 @@ class AircraftDAO:
     database=   ''
 
     def __init__(self): 
+        
+        # Initialize the DAO class with database connection details.
+        # In a real deployment this file would not be pushed to gitHub
+
         self.host=       cfg.mysql['host']
         self.user=       cfg.mysql['user']
         self.password=   cfg.mysql['password']
         self.database=   cfg.mysql['database']
     
     def getCursor(self): 
+
+        # Establish a connection to the MySQL database using provided configuration.
+
         self.connection = mysql.connector.connect(
             host=self.host,
             user=self.user,
@@ -26,12 +41,18 @@ class AircraftDAO:
         return self.cursor
 
     def closeAll(self):
+
+        # Close the database cursor and connection.
+
         if self.cursor:
             self.cursor.close()
         if self.connection:
             self.connection.close()
     
     def create(self, values):
+
+        # Insert a new aircraft record into the database.
+
         cursor = self.getCursor()
         sql = """
         INSERT INTO aircraft (
@@ -41,13 +62,18 @@ class AircraftDAO:
         ) 
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
+        # put the values into database using the sql insctructions
         cursor.execute(sql, values)
         self.connection.commit()
+        # Getting back out the latest ID used to be sent to the HTML to update table in browser memory
         newid = cursor.lastrowid
         self.closeAll()
         return newid
 
     def getAll(self):
+
+        # Retrieve all aircraft records from the database.
+
         cursor = self.getCursor()
         sql = """
         SELECT 
@@ -69,6 +95,9 @@ class AircraftDAO:
         return result
 
     def findByID(self, id):
+
+        # Finding just one aircraft
+
         cursor = self.getCursor()
         sql = "SELECT * FROM aircraft WHERE aircraft_id = %s"
         values = (id,)
@@ -78,6 +107,9 @@ class AircraftDAO:
         return result
 
     def update(self, values):
+
+        # Update an aircraft in the mysql database
+
         cursor = self.getCursor()
         sql = """
         UPDATE aircraft
@@ -97,6 +129,9 @@ class AircraftDAO:
         self.closeAll()
 
     def delete(self, id):
+
+        # Delete an aircraft from the mysql database
+
         cursor = self.getCursor()
         sql = "DELETE FROM aircraft WHERE aircraft_id = %s"
         values = (id,)

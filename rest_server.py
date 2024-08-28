@@ -1,3 +1,9 @@
+# rest_server.py
+# By David Burke
+
+
+#########################################################################################
+# Import required functions
 from flask import Flask, request, redirect, url_for, render_template, session, flash, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from aircraft_DAO import aircraftDAO
@@ -11,7 +17,10 @@ initalize_database.populate_table()
 
 
 #########################################################################################
+# Initialize the Flask application
 app = Flask(__name__)
+# Set the secret key for session management
+# This key is used to sign session cookies for security
 app.secret_key = 'verySecure' 
 
 #########################################################################################
@@ -19,6 +28,7 @@ app.secret_key = 'verySecure'
 #Passwords here
 #Passwords here
 # A simple in-memory user store
+# I would put this is a seperate paswords file in a real depoyment and this would not be uploaded to git hub for security
 users = {
     "admin": generate_password_hash("password123"),  # User 1
     "andrew": generate_password_hash("streachYourLegs"), # User 2
@@ -26,7 +36,7 @@ users = {
 }
 
 #########################################################################################
-# at the root page of the server
+### At the root page of the server
 @app.route('/')
 def serveLogin():
     if 'username' not in session:
@@ -36,46 +46,71 @@ def serveLogin():
 #########################################################################################
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    
+    # Handle user login.
+    # If the request method is POST, check the username and password.
+    # If valid, store the username in the session and redirect to the aircraft page.
+    # Otherwise, reload the login page with an error message.
+    
     if request.method == 'POST':
+        # Get the username and password from the form
         username = request.form['username']
         password = request.form['password']
 
-        # Check if the username exists and the password matches
+        # Simple check: In a real application, this should query the database
         if username in users and check_password_hash(users[username], password):
-            # Correct credentials, set session and redirect
+            # Store the username in the session
             session['username'] = username
             flash('You were successfully logged in', 'success')
+            # Redirect to the aircraft page
             return redirect(url_for('aircraftPage'))
         else:
-            # Incorrect credentials, redirect back to login with a message
+            # Flash an error message if credentials are invalid
             flash('Invalid username or password', 'danger')
+            # Redirect back to the login page
             return redirect(url_for('login'))
     
-    # If method is GET, simply render the login page
+     # Render the login template on a GET request
     return render_template('login.html')
 
 #########################################################################################
 @app.route('/logout')
 def logout():
-    # Clear the session data
+    
+    # Handle user logout.
+    # Remove the username from the session and redirect to the login page.
+    
+    # Remove the username from the session
     session.pop('username', None)
     flash('You were successfully logged out', 'success')
+    # Redirect to the login page
     return redirect(url_for('login'))
 
 @app.route('/aircraft')
 def aircraftPage():
+
+    # Display the aircraft management page.
+    # If the user is not logged in, redirect to the login page.
+
     if 'username' not in session:
+        # If the user is not logged in, redirect to the login page
         return redirect(url_for('login'))
+    # Render the aircraft management page
     return render_template('aircraft.html')
 
 @app.route('/aircraftdata', methods=['GET'])
 def get_aircraft_data():
+
+    #  Provide JSON data of all aircraft.
+    # This endpoint is used by the aircraft management page to load data.
+
     if 'username' not in session:
         return redirect(url_for('login'))
     
+    # Fetch all aircraft data from the database
     aircraftList = aircraftDAO.getAll()
 
-    # Assuming aircraft_list is a list of tuples, convert it to a list of dictionaries
+    # converting a it to a list of dictionaries from a list
     aircraftData = []
     for aircraft in aircraftList:
         aircraftDict = {
@@ -92,7 +127,7 @@ def get_aircraft_data():
         }
         aircraftData.append(aircraftDict)
 
-
+    # Return the data in JSON format
     return jsonify(aircraftData)
 
 
@@ -103,11 +138,16 @@ def get_aircraft_data():
 # Retrieve all aircraft
 @app.route('/aircraft', methods=['POST'])
 def createAircraft():
+
+    # Handle the creation of a new aircraft.
+    # Receive aircraft data from the request and insert it into the database.
+
     if 'username' not in session:
         return redirect(url_for('login'))
 
     if not request.json:
         abort(400)
+    # Putting the aircraft data into a dictionary
     aircraft = {
         "model_name": request.json.get("model_name"),
         "manufacturer": request.json.get("manufacturer"),
@@ -119,9 +159,11 @@ def createAircraft():
         "country_of_registration": request.json.get("country_of_registration"),
         "engine_type": request.json.get("engine_type"),
     }
-    aircraft_id = aircraftDAO.create(tuple(aircraft.values()))
-    aircraft["aircraft_id"] = aircraft_id
-    
+    # Insert the new aircraft into the database using DAO. The my DAO server will return the aircraft id
+    aircraftID = aircraftDAO.create(tuple(aircraft.values()))
+    # Getting the aircraft id from the update mysql 
+    aircraft["aircraft_id"] = aircraftID
+    # Return the new aircraft in JSON format
     return jsonify(aircraft), 201
 
 
@@ -142,9 +184,14 @@ def findAircraftById(id):
 # curl -X "PUT" -d "{\"Title\":\"New Title\", \"Price\":999}" -H "content-type:application/json" http://127.0.0.1:5000/books/1
 @app.route('/aircraft/<int:id>', methods=['PUT'])
 def updateAircraft(id):
+
+    # Handle the update of an existing aircraft.
+    # Receive updated aircraft data and update it in the database.
+
     if 'username' not in session:
         return redirect(url_for('login'))
     
+    # Getting current aircraft data from the mysql server
     aircraft = aircraftDAO.findByID(id)
     if aircraft is None:
         return jsonify({}), 404
@@ -152,7 +199,7 @@ def updateAircraft(id):
     if not request.json:
         abort(400)
     
-    # Convert the tuple returned by findByID to a dictionary
+    # Converting the tuple returned by findByID to a dictionary
     foundAircraft = {
         "model_name": aircraft[1],
         "manufacturer": aircraft[2],
@@ -166,6 +213,7 @@ def updateAircraft(id):
         "aircraft_id": aircraft[0]
     }
 
+    # Getting the updated info from the html request
     reqJson = request.json
 
     # Update the dictionary with the new values from the request
@@ -179,6 +227,7 @@ def updateAircraft(id):
     foundAircraft['country_of_registration'] = reqJson.get('country_of_registration', foundAircraft['country_of_registration'])
     foundAircraft['engine_type'] = reqJson.get('engine_type', foundAircraft['engine_type'])
 
+    # Converting to a tuple for the mysql server
     updated_aircraft = tuple(foundAircraft.values())
 
     # Pass the tuple to the update method
@@ -191,6 +240,10 @@ def updateAircraft(id):
 # Delete aircraft
 @app.route('/aircraft/<int:id>', methods=['DELETE'])
 def deleteAircraft(id):
+
+    # Handle the deletion of an aircraft.
+    # Remove the specified aircraft from the database.
+
     if 'username' not in session:
         return redirect(url_for('login'))
     
@@ -198,11 +251,15 @@ def deleteAircraft(id):
     if aircraft is None:
         return jsonify({}), 404
     
+    # Delete the aircraft from the database using DAO
     aircraftDAO.delete(id)
-    return jsonify({"result": True})
+    # Return a success message
+    return jsonify({"status": "success"}), 200
 
 #########################################################################################
 #########################################################################################
 #########################################################################################
+# Main entry point for the Flask application
 if __name__ == "__main__":
+     # Run the Flask development server
     app.run(debug=True)

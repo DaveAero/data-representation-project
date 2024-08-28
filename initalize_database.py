@@ -1,3 +1,9 @@
+# initalize_database.py
+# By David Burke
+
+
+#########################################################################################
+# Import required functions
 from aircraft_DAO import aircraftDAO
 import mysql.connector 
 
@@ -16,7 +22,7 @@ CREATE TABLE IF NOT EXISTS aircraft (
     engine_type VARCHAR(100) -- Type of engine
 );
 """
-
+#########################################################################################
 # The data to be inserted
 aircraft_data = [
     ('Boeing 737-800', 'Boeing', 33541, 189, '2024-08-10', True, 'United States', 'Ireland', 'CFM56-7B'),
@@ -69,9 +75,8 @@ aircraft_data = [
     ('Airbus A320-200', 'Airbus', 7744, 174, '2024-08-02', True, 'France', 'France', 'CFM56-5B4/3') 
 ]
 
-###
+#########################################################################################
 ### Creating the Database
-###
 def create_db():
     # estblishing connection with the mysql server
     mydb = mysql.connector.connect(
@@ -90,9 +95,8 @@ def create_db():
     # Checking the code got this far
     print("Database Created")
 
-###
+#########################################################################################
 ### Creating the Table
-###
 def create_table():
     # Connecting to the database created above
     mydb = mysql.connector.connect(
@@ -110,9 +114,8 @@ def create_table():
     mydb.close()
     print("Table Created")
 
-###
+#########################################################################################
 ### Populating the table
-###
 def populate_table():
     global aircraft_data
 
@@ -120,9 +123,8 @@ def populate_table():
         aircraftDAO.create( aircraft)
     print("Table has been populated")
 
-###
+#########################################################################################
 ### Check if Database already exists, Drop if it does
-###
 def check_and_drop_db():
     # Establishing connection with the MySQL server
     mydb = mysql.connector.connect(
