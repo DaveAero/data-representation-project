@@ -5,6 +5,6 @@
 mysql = {
     'host':"davidgerburke.mysql.pythonanywhere-services.com",
     'user':"davidgerburke", # root
-    'password':"LfJ3N9yuiqrL.f6", # 
+    'password':"69gjM3/Aft4zB8b", # 
     'database':"davidgerburke$aircraft"
 }
