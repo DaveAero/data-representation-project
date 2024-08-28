@@ -87,7 +87,7 @@ def create_db():
     # initalising the connection in mycursor
     mycursor = mydb.cursor()
     # executing SQL to create the database
-    mycursor.execute("CREATE DATABASE IF NOT EXISTS aircraft_database")
+    mycursor.execute("CREATE DATABASE IF NOT EXISTS aircraft")
     # Closing the cursor
     mycursor.close()
     # Closing the mysql connection
@@ -101,7 +101,7 @@ def create_table():
     # Connecting to the database created above
     mydb = mysql.connector.connect(
         host="localhost", user="root",
-        password="", database="aircraft_database"
+        password="", database="aircraft"
     )
 
     # initalising the connection in mycursor
@@ -134,15 +134,15 @@ def check_and_drop_db():
     mycursor = mydb.cursor()
     
     # Check if the database exists
-    mycursor.execute("SHOW DATABASES LIKE 'aircraft_database'")
+    mycursor.execute("SHOW DATABASES LIKE 'aircraft'")
     result = mycursor.fetchone()
     
     if result:
         # Drop the database if it exists
-        mycursor.execute("DROP DATABASE aircraft_database")
-        print("Database 'aircraft_database' dropped.")
+        mycursor.execute("DROP DATABASE aircraft")
+        print("Database 'aircraft' dropped.")
     else:
-        print("Database 'aircraft_database' does not exist, proceeding to create it.")
+        print("Database 'aircraft' does not exist, proceeding to create it.")
     
     # Closing the cursor and connection
     mycursor.close()
