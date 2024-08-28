@@ -3,7 +3,7 @@
 
 # login requirements for mysql server
 mysql = {
-    'host':"localhost",
+    'host':"davidgerburke.mysql.pythonanywhere-services.com",
     'user':"davidgerburke", # root
     'password':"VerySecurePassword", # 
     'database':"aircraft"
