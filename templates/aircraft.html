@@ -237,11 +237,11 @@
     
     function logout() {
         $.ajax({
-            url: "http://127.0.0.1:5000/logout",
+            url: "/logout",
             method: "GET",
             success: function() {
                 // Redirect to the login page after successful logout
-                window.location.href = "http://127.0.0.1:5000/login";
+                window.location.href = "/login";
             },
             error: function(xhr, status, error) {
                 console.log("Logout error: " + status + " " + error);
@@ -251,7 +251,7 @@
 
     function getAllAjax(){
         $.ajax({
-            "url": "http://127.0.0.1:5000/aircraftdata",
+            "url": "/aircraftdata",
             "method":"GET",
             "data":"",
             "dataType": "JSON",
@@ -270,7 +270,7 @@
     function createAircraftAjax(aircraft){
         console.log(aircraft);
         $.ajax({
-            "url": "http://127.0.0.1:5000/aircraft",
+            "url": "/aircraft",
             "method":"POST",
             "data":JSON.stringify(aircraft),
             "dataType": "JSON",
@@ -292,7 +292,7 @@
         console.log(aircraft);
         console.log(JSON.stringify(aircraft));
         $.ajax({
-            "url": "http://127.0.0.1:5000/aircraft/"+encodeURI(aircraft.aircraft_id),
+            "url": "/aircraft/"+encodeURI(aircraft.aircraft_id),
             "method":"PUT",
             "data":JSON.stringify(aircraft),
             "dataType": "JSON",
@@ -308,7 +308,7 @@
 
     function deleteAircraftAjax(id){
         $.ajax({
-            "url": "http://127.0.0.1:5000/aircraft/"+encodeURI(id),
+            "url": "/aircraft/"+encodeURI(id),
             "method":"DELETE",
             "data":"",
             "dataType": "JSON",
