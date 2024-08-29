@@ -7,13 +7,13 @@
 from flask import Flask, request, redirect, url_for, render_template, session, flash, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from aircraft_DAO import aircraftDAO
-import initalize_database
+from initalize_database import initalizeDBDAO
 
 # Initalising Database
-initalize_database.check_and_drop_db()
-initalize_database.create_db()
-initalize_database.create_table()
-initalize_database.populate_table()
+initalizeDBDAO.checkAndDropDB()
+initalizeDBDAO.createDB()
+initalizeDBDAO.createTable()
+initalizeDBDAO.populateTable()
 
 
 #########################################################################################
