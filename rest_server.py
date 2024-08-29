@@ -144,9 +144,7 @@ def createAircraft():
 
     if 'username' not in session:
         return redirect(url_for('login'))
-
-    if not request.json:
-        abort(400)
+    
     # Putting the aircraft data into a dictionary
     aircraft = {
         "model_name": request.json.get("model_name"),
