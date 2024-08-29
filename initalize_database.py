@@ -14,7 +14,7 @@ class InitalizeDBDAO:
     def createDB(self):
         # estblishing connection with the mysql server
         mydb = mysql.connector.connect(
-            host="davidgerburke.mysql.pythonanywhere-services.comlocalhost", user="davidgerburke",
+            host="davidgerburke.mysql.pythonanywhere-services.com", user="davidgerburke",
             password="pythonanywhere"
         )
 
@@ -36,7 +36,7 @@ class InitalizeDBDAO:
     def createTable(self):
         # estblishing connection with the mysql server
         mydb = mysql.connector.connect(
-            host="davidgerburke.mysql.pythonanywhere-services.comlocalhost", user="davidgerburke",
+            host="davidgerburke.mysql.pythonanywhere-services.com", user="davidgerburke",
             password="pythonanywhere", database='davidgerburke$aircraftData'
         )
 
@@ -132,7 +132,7 @@ class InitalizeDBDAO:
     def checkAndDropDB(self):
         # estblishing connection with the mysql server
         mydb = mysql.connector.connect(
-            host="davidgerburke.mysql.pythonanywhere-services.comlocalhost", user="davidgerburke",
+            host="davidgerburke.mysql.pythonanywhere-services.com", user="davidgerburke",
             password="pythonanywhere"
         )
 
