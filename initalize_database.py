@@ -6,6 +6,7 @@
 # Import required functions
 from aircraft_DAO import aircraftDAO
 import mysql.connector 
+import dbconfig as cfg
 
 # The Main AircraftDAO class
 class InitalizeDBDAO:
@@ -14,8 +15,8 @@ class InitalizeDBDAO:
     def createDB(self):
         # estblishing connection with the mysql server
         mydb = mysql.connector.connect(
-            host="davidgerburke.mysql.pythonanywhere-services.com", user="davidgerburke",
-            password="pythonanywhere"
+            host=cfg.mysql['host'], user=cfg.mysql['user'],
+            password=cfg.mysql['password']
         )
 
         # initalising the connection in mycursor
@@ -36,8 +37,8 @@ class InitalizeDBDAO:
     def createTable(self):
         # estblishing connection with the mysql server
         mydb = mysql.connector.connect(
-            host="davidgerburke.mysql.pythonanywhere-services.com", user="davidgerburke",
-            password="pythonanywhere", database='davidgerburke$aircraftData'
+            host=cfg.mysql['host'], user=cfg.mysql['user'],
+            password=cfg.mysql['password'], database=cfg.mysql['database']
         )
 
         # initalising the connection in mycursor
@@ -132,8 +133,8 @@ class InitalizeDBDAO:
     def checkAndDropDB(self):
         # estblishing connection with the mysql server
         mydb = mysql.connector.connect(
-            host="davidgerburke.mysql.pythonanywhere-services.com", user="davidgerburke",
-            password="pythonanywhere"
+            host=cfg.mysql['host'], user=cfg.mysql['user'],
+            password=cfg.mysql['password']
         )
 
         # initalising the connection in mycursor
