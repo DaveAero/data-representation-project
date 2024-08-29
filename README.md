@@ -113,3 +113,14 @@ Click the "Logout" button on the top-right corner to log out of the application.
 
 ## Database Initialization
 The initialize_database.py script will create the database and tables required for the application. Make sure to update the database configuration in dbconfig.py before running the script.
+
+## Python Anywhere Deployment
+
+This server is also deployed on **Python Anywhere**. You can access it using the link below:
+
+🔗 **[Click here to access the deployed server](https://davidgerburke.pythonanywhere.com/)**
+
+> **Note:** The login credentials remain the same.
+>
+> - **User:** `admin`
+> - **Password:** `password123`
